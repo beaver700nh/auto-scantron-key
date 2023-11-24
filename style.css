@@ -33,11 +33,6 @@ html, body {
 
 body {
   display: flex;
-  flex-flow: column nowrap;
-  place-content: flex-start;
-  place-items: flex-start;
-  padding: 20px;
-  gap: 10px;
 }
 
 button, select {
@@ -71,3 +66,12 @@ button:active, select:active {
 .header :nth-child(1) { color: var(--fg0); }
 .header :nth-child(2) { color: var(--fg2); }
 .header :nth-child(3) { color: var(--fg1); }
+
+.wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+  place-content: center;
+  place-items: center;
+  margin: auto;
+  gap: 10px;
+}
