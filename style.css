@@ -1,0 +1,73 @@
+:root {
+  --bg:  hsl(192, 40%, 3%);
+  --fg0: hsl(192, 80%, 95%);
+  --fg1: hsl(192, 80%, 75%);
+  --fg2: hsl(192, 80%, 50%);
+}
+
+* {
+  color: var(--fg0);
+  background-color: var(--bg);
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-family: Helvetica, sans-serif;
+}
+
+html {
+  position: fixed;
+}
+
+body {
+  position: absolute;
+}
+
+html, body {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  display: flex;
+  flex-flow: column nowrap;
+  place-content: flex-start;
+  place-items: flex-start;
+  padding: 20px;
+  gap: 10px;
+}
+
+button, select {
+  position: relative;
+  z-index: 2;
+  background-color: hsl(from var(--bg) h s calc(l * 3));
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+
+button:hover, select:hover {
+  filter: brightness(1.5) saturate(2.0);
+}
+
+button:active, select:active {
+  filter: hue-rotate(-60deg);
+}
+
+.header {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 0px;
+  padding: 0px;
+}
+
+.header > * {
+  padding: 0px;
+}
+
+.header :nth-child(1) { color: var(--fg0); }
+.header :nth-child(2) { color: var(--fg2); }
+.header :nth-child(3) { color: var(--fg1); }

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>AutoScantronKey</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1 class="header">
+      <span>Auto</span>
+      <span>Scantron</span>
+      <span>Key</span>
+    </h1>
+    <button class="upload">Upload Test as .TST</button>
+    <select class="ans-sheet">
+      <option>Select an answer sheet&hellip;</option>
+    </select>
+    <button class="generate">Generate Key</button>
+    <embed type="application/pdf" />
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.es.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
