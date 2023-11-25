@@ -45,10 +45,14 @@ class Generator {
   }
 
   generate(testData) {
+    this.pdf.setDocumentProperties({title: testData.meta.subject});
+
     this.drawBackground();
-    this.drawMetadata();
+    // this.drawMetadata();
+    this.generateMetadata(testData.meta);
     this.drawBubbles("keys");
-    this.drawBubbles("blocks");
+    // this.drawBubbles("answers");
+    this.generateAnswers(testData.answers);
   }
 
   drawBackground() {
@@ -78,6 +82,15 @@ class Generator {
     }
   }
 
+  generateMetadata(meta) {
+    for (const [name, {page, x, y}] of Object.entries(this.sheetProperties.inputs.meta)) {
+      this.pdf
+        .setPage(page)
+        .setDrawColor(0, 0, 0)
+        .text(meta[name], x + Constants.Margin, y - Constants.Margin);
+    }
+  }
+
   drawBubbles(type) {
     for (const [, blockData] of Object.entries(this.sheetProperties.inputs[type])) {
       const {page, bubbles, questions} = blockData;
@@ -86,10 +99,32 @@ class Generator {
         .setPage(page)
         .setFillColor(type === "keys" ? "#00FF00" : "#0000FF");
 
-      for (let question = 0; question < questions; question++) {
-        for (let bubble = 0; bubble < bubbles; bubble++) {
+      for (let question = 0; question < questions; ++question) {
+        for (let bubble = 0; bubble < bubbles; ++bubble) {
           this.pdf.__Mark(blockData, question, bubble);
         }
+      }
+    }
+  }
+
+  generateAnswers(answers) {
+    for (const [start, blockData] of Object.entries(this.sheetProperties.inputs.answers)) {
+      const _start = parseInt(start, 10);
+      const {page, questions} = blockData;
+
+      this.pdf
+        .setPage(page)
+        .setFillColor(0, 0, 0);
+
+      for (let question = 0; question < questions; ++question) {
+        const bubble = answers[_start + question - 1];
+        console.log(`answer[${_start + question - 1}] = ${bubble}`);
+        console.log(`question #${question} of block #${_start}`);
+        console.log(`_start = ${_start}, question = ${question}, index = ${_start} + ${question} - 1 = ${_start + question - 1}`);
+        console.log("==");
+        if (bubble == null) continue;
+
+        this.pdf.__Mark(blockData, question, bubble);
       }
     }
   }
@@ -113,7 +148,42 @@ function generate() {
     return;
   }
 
-  const testData = null; // TODO
+  const testData = {
+    meta: {
+      name: "Answer Key",
+      subject: "Test Name Here", // user input + autofill
+      period: "A",               // user input + autofill
+      date: "YYYY-MM-DD",        // user input + autofill
+    },
+    keys: {
+      // user input + autofill
+    },
+    answers: [
+      0, 0, 1, 0, 0,
+      1, 2, 1, 0, 0,
+      1, 2, 3, 2, 1,
+      0, 0, 1, 2, 3,
+      4, 3, 2, 1, 0,
+
+      4, 4, 3, 4, 4,
+      3, 2, 3, 4, 4,
+      3, 2, 1, 2, 3,
+      4, 4, 3, 2, 1,
+      0, 1, 2, 3, 4,
+
+      0, 1, 2, 1, 2,
+      3, 2, 3, 4, 4,
+      3, 2, 3, 2, 1,
+      2, 1, 0, 4, 3,
+      4, 3, 2, 1, 0,
+
+      0, 0, 0, 0, 0,
+      1, 1, 1, 1, 1,
+      2, 2, 2, 2, 2,
+      3, 3, 3, 3, 3,
+      4, 4, 4, 4, 4,
+    ],
+  };
 
   const generator = new Generator(sheetProperties);
   generator.generate(testData);

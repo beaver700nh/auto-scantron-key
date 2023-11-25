@@ -79,7 +79,7 @@ const AnswerSheets = {
           questions: 2,
         },
       },
-      blocks: {
+      answers: {
         1: {
           page: 1,
           x: 0 + 201/256,
