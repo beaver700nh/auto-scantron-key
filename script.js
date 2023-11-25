@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", main);
 
+const TestData = {
+  meta: {
+    name: "Answer Key",
+    date: new Date().toLocaleString("sv").slice(0, 10),
+  },
+  answers: [
+    0, 1, 2, 3, 4,
+  ],
+};
+
 function main() {
   populateAnswerSheets();
   configureButtonBindings();
@@ -53,19 +63,15 @@ class Generator {
     // this.drawMetadata();
     this.generateMetadata(testData.meta);
 
+    // this.drawBubbles("keys");
     if (
-      // Some Scantron keys have a 1/2/3/5 row format with one row per block
-      // whereas others have a KEY/ITEM/COUNT block format with
-      // multiple rows per block to input the number of items.
-      Object.values(this.sheetProperties.inputs.keys).every(({questions}) => questions === 1)
+      // If the answer sheet has multiple rows per key block,
+      // it is probably a KEY/ITEM/COUNT block format and can be autofilled.
+      Object.values(this.sheetProperties.inputs.keys).some(({questions}) => questions !== 1)
     ) {
-      this.generateKeys_config(testData.keys);
-    }
-    else {
-      this.generateKeys_count(testData.answers);
+      this.generateKeys(testData.answers);
     }
 
-    // this.drawBubbles("keys");
     // this.drawBubbles("answers");
     this.generateAnswers(testData.answers);
   }
@@ -102,7 +108,7 @@ class Generator {
       this.pdf
         .setPage(page)
         .setDrawColor(0, 0, 0)
-        .text(meta[name], x + Constants.Margin, y - Constants.Margin);
+        .text(meta[name] ?? "", x + Constants.Margin, y - Constants.Margin);
     }
   }
 
@@ -122,24 +128,30 @@ class Generator {
     }
   }
 
-  generateKeys_config(keys) {
+  generateKeys(answers) {
+    const total = Math.max(...Object.keys(answers)) + 1;
+
     for (const [, blockData] of Object.entries(this.sheetProperties.inputs.keys)) {
-      const {page} = blockData;
+      const {page, questions} = blockData;
 
       this.pdf
         .setPage(page)
         .setFillColor(0, 0, 0);
 
-      for (const bubble of [1, 2, 3, 5]) {
-        if (keys[bubble] === true) {
-          this.pdf.__Mark(blockData, 0, bubble - 1);
-        }
+      const firstQuestion = Math.min(
+        ...Object.entries(this.sheetProperties.inputs.answers)
+          .filter(([, {page}]) => page === blockData.page)
+          .map(([start]) => parseInt(start, 10) - 1)
+      );
+      let count = total - firstQuestion;
+
+      if (count <= 0) continue;
+
+      for (let question = questions - 1; question >= 0; --question) {
+        this.pdf.__Mark(blockData, question, count % 10);
+        count = Math.floor(count / 10);
       }
     }
-  }
-
-  generateKeys_count(answers) {
-    // TODO
   }
 
   generateAnswers(answers) {
@@ -179,47 +191,9 @@ function generate() {
     return;
   }
 
-  const testData = {
-    meta: {
-      name: "Answer Key",
-      subject: "Test Name Here", // user input + autofill
-      period: "A",               // user input + autofill
-      date: "YYYY-MM-DD",        // user input + autofill
-    },
-    keys: { // user input + autofill
-      1: true,
-      2: true,
-      3: true,
-      5: true,
-    },
-    answers: [
-      0, 0, 1, 0, 0,
-      1, 2, 1, 0, 0,
-      1, 2, 3, 2, 1,
-      0, 0, 1, 2, 3,
-      4, 3, 2, 1, 0,
-
-      4, 4, 3, 4, 4,
-      3, 2, 3, 4, 4,
-      3, 2, 1, 2, 3,
-      4, 4, 3, 2, 1,
-      0, 1, 2, 3, 4,
-
-      0, 1, 2, 1, 2,
-      3, 2, 3, 4, 4,
-      3, 2, 3, 2, 1,
-      2, 1, 0, 4, 3,
-      4, 3, 2, 1, 0,
-
-      0, 0, 0, 0, 0,
-      1, 1, 1, 1, 1,
-      2, 2, 2, 2, 2,
-      3, 3, 3, 3, 3,
-      4, 4, 4, 4, 4,
-    ],
-  };
+  // TODO add popup box to input metas, esp. not autofilled
 
   const generator = new Generator(sheetProperties);
-  generator.generate(testData);
+  generator.generate(TestData);
   generator.export();
 }
