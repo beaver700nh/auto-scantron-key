@@ -30,13 +30,14 @@ class Generator {
       .setFont("courier", "bold")
       .setFontSize(12);
 
-    const markFunction = this.pdf[sheetProperties.bubble.type].bind(this.pdf);
+    const markFunction = this.pdf[sheetProperties.bubble.type];
     const markDimensions = sheetProperties.bubble.type === "circle" ?
       [sheetProperties.bubble.r] :
       [sheetProperties.bubble.w, sheetProperties.bubble.h];
 
     this.pdf.__Mark = (blockData, question, bubble) => {
-      markFunction(
+      markFunction.call(
+        this.pdf,
         blockData.x + question * blockData.dQuestion.x + bubble * blockData.dBubble.x,
         blockData.y + question * blockData.dQuestion.y + bubble * blockData.dBubble.y,
         ...markDimensions, "F",
@@ -48,9 +49,23 @@ class Generator {
     this.pdf.setDocumentProperties({title: testData.meta.subject});
 
     this.drawBackground();
+
     // this.drawMetadata();
     this.generateMetadata(testData.meta);
-    this.drawBubbles("keys");
+
+    if (
+      // Some Scantron keys have a 1/2/3/5 row format with one row per block
+      // whereas others have a KEY/ITEM/COUNT block format with
+      // multiple rows per block to input the number of items.
+      Object.values(this.sheetProperties.inputs.keys).every(({questions}) => questions === 1)
+    ) {
+      this.generateKeys_config(testData.keys);
+    }
+    else {
+      this.generateKeys_count(testData.answers);
+    }
+
+    // this.drawBubbles("keys");
     // this.drawBubbles("answers");
     this.generateAnswers(testData.answers);
   }
@@ -107,6 +122,26 @@ class Generator {
     }
   }
 
+  generateKeys_config(keys) {
+    for (const [, blockData] of Object.entries(this.sheetProperties.inputs.keys)) {
+      const {page} = blockData;
+
+      this.pdf
+        .setPage(page)
+        .setFillColor(0, 0, 0);
+
+      for (const bubble of [1, 2, 3, 5]) {
+        if (keys[bubble] === true) {
+          this.pdf.__Mark(blockData, 0, bubble - 1);
+        }
+      }
+    }
+  }
+
+  generateKeys_count(answers) {
+    // TODO
+  }
+
   generateAnswers(answers) {
     for (const [start, blockData] of Object.entries(this.sheetProperties.inputs.answers)) {
       const _start = parseInt(start, 10);
@@ -151,8 +186,11 @@ function generate() {
       period: "A",               // user input + autofill
       date: "YYYY-MM-DD",        // user input + autofill
     },
-    keys: {
-      // user input + autofill
+    keys: { // user input + autofill
+      1: true,
+      2: true,
+      3: true,
+      5: true,
     },
     answers: [
       0, 0, 1, 0, 0,
