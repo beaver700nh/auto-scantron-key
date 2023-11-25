@@ -27,7 +27,7 @@ class Generator {
     this.pdf = new jspdf.jsPDF({unit: "in", format: [w, h]})
       .setLineWidth(0.01)
       .addPage()
-      .setFont("courier")
+      .setFont("courier", "bold")
       .setFontSize(12);
 
     const markFunction = this.pdf[sheetProperties.bubble.type].bind(this.pdf);
@@ -118,10 +118,6 @@ class Generator {
 
       for (let question = 0; question < questions; ++question) {
         const bubble = answers[_start + question - 1];
-        console.log(`answer[${_start + question - 1}] = ${bubble}`);
-        console.log(`question #${question} of block #${_start}`);
-        console.log(`_start = ${_start}, question = ${question}, index = ${_start} + ${question} - 1 = ${_start + question - 1}`);
-        console.log("==");
         if (bubble == null) continue;
 
         this.pdf.__Mark(blockData, question, bubble);
