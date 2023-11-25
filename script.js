@@ -1,13 +1,7 @@
 document.addEventListener("DOMContentLoaded", main);
 
-const TestData = {
-  meta: {
-    name: "Answer Key",
-    date: new Date().toLocaleString("sv").slice(0, 10),
-  },
-  answers: [
-    0, 1, 2, 3, 4,
-  ],
+var TestData = {
+  answers: {},
 };
 
 function main() {
@@ -26,7 +20,17 @@ function populateAnswerSheets() {
 }
 
 function configureButtonBindings() {
+  document.querySelector(".upload").addEventListener("click", upload);
   document.querySelector(".generate").addEventListener("click", generate);
+}
+
+function upload() {
+  // TODO
+  TestData.answers = {
+     0: 0,  1: 1,  2: 2,  3: 3,  4: 4,
+    10: 0, 11: 1, 12: 2, 13: 3, 14: 4,
+    95: 0, 96: 1, 97: 2, 98: 3, 99: 4,
+  };
 }
 
 class Generator {
@@ -191,7 +195,46 @@ function generate() {
     return;
   }
 
-  // TODO add popup box to input metas, esp. not autofilled
+  populateMissingMetadata(sheetProperties);
+}
+
+function populateMissingMetadata(sheetProperties) {
+  TestData.meta = {
+    name: "Answer Key",
+    date: new Date().toLocaleString("sv").slice(0, 10),
+  };
+
+  const data = document.querySelector(".data");
+  data.replaceChildren();
+
+  for (const [name] of Object.entries(sheetProperties.inputs.meta)) {
+    const label = document.createElement("label");
+    label.innerText = name.charAt(0).toUpperCase() + name.slice(1);
+    label.htmlFor = name;
+    data.appendChild(label);
+
+    const input = document.createElement("input");
+    input.id = name;
+    input.value = TestData.meta[name] ?? "";
+    input.onchange = () => TestData.meta[name] = input.value;
+    data.appendChild(input);
+  }
+
+  const popup = document.querySelector(".popup");
+  popup.classList.remove("hidden");
+
+  const close = document.querySelector(".close");
+  close.addEventListener("click", finish);
+}
+
+function finish() {
+  const popup = document.querySelector(".popup");
+  popup.classList.add("hidden");
+
+  this.removeEventListener("click", finish);
+
+  const answerSheet = document.querySelector(".ans-sheet");
+  const sheetProperties = AnswerSheets[answerSheet.value];
 
   const generator = new Generator(sheetProperties);
   generator.generate(TestData);

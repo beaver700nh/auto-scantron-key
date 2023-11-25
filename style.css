@@ -14,7 +14,7 @@
   font-family: Helvetica, sans-serif;
 }
 
-html {
+html, .popup {
   position: fixed;
 }
 
@@ -22,7 +22,7 @@ body {
   position: absolute;
 }
 
-html, body {
+html, body, .popup {
   top: 0px;
   left: 0px;
   right: 0px;
@@ -31,11 +31,11 @@ html, body {
   padding: 0px;
 }
 
-body {
+body, .popup {
   display: flex;
 }
 
-button, select {
+button, select, input {
   position: relative;
   z-index: 2;
   background-color: hsl(from var(--bg) h s calc(l * 3));
@@ -44,11 +44,11 @@ button, select {
   transition: all 0.1s ease-in-out;
 }
 
-button:hover, select:hover {
+button:hover, select:hover, input:hover {
   filter: brightness(1.5) saturate(2.0);
 }
 
-button:active, select:active {
+button:active, select:active, input:active {
   filter: hue-rotate(-60deg);
 }
 
@@ -74,4 +74,29 @@ button:active, select:active {
   place-items: center;
   margin: auto;
   gap: 10px;
+}
+
+.popup {
+  z-index: 999;
+  background-color: var(--bg);
+}
+
+.content {
+  display: flex;
+  flex-flow: column nowrap;
+  place-content: flex-start;
+  place-items: flex-start;
+  margin: auto;
+  gap: 10px;
+}
+
+.data {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px;
+  border: 1px solid var(--fg1);
+}
+
+.hidden {
+  display: none !important;
 }
