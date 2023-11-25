@@ -63,6 +63,21 @@ const AnswerSheets = {
           bubbles: 10,
           questions: 3,
         },
+        4: {
+          page: 2,
+          x: 2 + 111/512,
+          y: 8 + 2045/4096,
+          dBubble: {
+            x: 0,
+            y: -683/4096,
+          },
+          dQuestion: {
+            x: -85/512,
+            y: 0,
+          },
+          bubbles: 10,
+          questions: 2,
+        },
       },
       blocks: {
         1: {
@@ -91,6 +106,36 @@ const AnswerSheets = {
           dQuestion: {
             x: 0,
             y: 683/2048,
+          },
+          bubbles: 5,
+          questions: 25,
+        },
+        51: {
+          page: 2,
+          x: 4 + 183/256,
+          y: 10,
+          dBubble: {
+            x: -85/512,
+            y: 0,
+          },
+          dQuestion: {
+            x: 0,
+            y: -683/2048,
+          },
+          bubbles: 5,
+          questions: 25,
+        },
+        76: {
+          page: 2,
+          x: 3 + 141/256,
+          y: 9 + 3413/4096,
+          dBubble: {
+            x: -85/512,
+            y: 0,
+          },
+          dQuestion: {
+            x: 0,
+            y: -683/2048,
           },
           bubbles: 5,
           questions: 25,
