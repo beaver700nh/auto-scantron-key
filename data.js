@@ -12,6 +12,10 @@ const AnswerSheets = {
       1: "https://cdn11.bigcommerce.com/s-30cdzu3o6a/images/stencil/1280x1280/products/126/434/19641-6-1__47970.1674581161.jpg?c=1",
       2: "https://cdn11.bigcommerce.com/s-30cdzu3o6a/images/stencil/1280x1280/products/126/435/19641-6-2__48206.1674581161.jpg?c=1",
     },
+    bubble: {
+      type: "circle",
+      r: 1/16,
+    },
     inputs: {
       meta: {
         name: {
@@ -41,6 +45,55 @@ const AnswerSheets = {
           y: 10 + 3/16,
           w: 1 + 1/8,
           h: 0 + 5/16,
+        },
+      },
+      keys: {
+        1: {
+          page: 1,
+          x: 3 + 15/128,
+          y: 2 + 171/512,
+          dBubble: {
+            x: 0,
+            y: 683/4096,
+          },
+          dQuestion: {
+            x: 85/512,
+            y: 0,
+          },
+          bubbles: 10,
+          questions: 3,
+        },
+      },
+      blocks: {
+        1: {
+          page: 1,
+          x: 0 + 201/256,
+          y: 0 + 53/64,
+          dBubble: {
+            x: 85/512,
+            y: 0,
+          },
+          dQuestion: {
+            x: 0,
+            y: 683/2048,
+          },
+          bubbles: 5,
+          questions: 25,
+        },
+        26: {
+          page: 1,
+          x: 1 + 243/256,
+          y: 1,
+          dBubble: {
+            x: 85/512,
+            y: 0,
+          },
+          dQuestion: {
+            x: 0,
+            y: 683/2048,
+          },
+          bubbles: 5,
+          questions: 25,
         },
       },
     },

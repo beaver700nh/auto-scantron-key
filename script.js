@@ -19,53 +19,103 @@ function configureButtonBindings() {
   document.querySelector(".generate").addEventListener("click", generate);
 }
 
+class Generator {
+  constructor(sheetProperties) {
+    this.sheetProperties = sheetProperties;
+
+    const {w, h} = sheetProperties.dimensions;
+    this.pdf = new jspdf.jsPDF({unit: "in", format: [w, h]})
+      .setLineWidth(0.01)
+      .addPage()
+      .setFont("courier")
+      .setFontSize(12);
+
+    const markFunction = this.pdf[sheetProperties.bubble.type].bind(this.pdf);
+    const markDimensions = sheetProperties.bubble.type === "circle" ?
+      [sheetProperties.bubble.r] :
+      [sheetProperties.bubble.w, sheetProperties.bubble.h];
+
+    this.pdf.__Mark = (blockData, question, bubble) => {
+      markFunction(
+        blockData.x + question * blockData.dQuestion.x + bubble * blockData.dBubble.x,
+        blockData.y + question * blockData.dQuestion.y + bubble * blockData.dBubble.y,
+        ...markDimensions, "F",
+      );
+    };
+  }
+
+  generate(testData) {
+    this.drawBackground();
+    this.drawMetadata();
+    this.drawBubbles("keys");
+    this.drawBubbles("blocks");
+  }
+
+  drawBackground() {
+    const {w, h} = this.sheetProperties.dimensions;
+    for (const [page, url] of Object.entries(this.sheetProperties.images)) {
+      this.pdf.setPage(page);
+      this.pdf.addImage(url, "JPEG", 0, 0, w, h);
+    }
+  }
+
+  drawMetadata() {
+    for (const [name, {page, x, y, w, h}] of Object.entries(this.sheetProperties.inputs.meta)) {
+      this.pdf
+        .setPage(page)
+        .setFillColor(255, 255, 0)
+        .rect(x, y, w, -h, "F")
+        .setDrawColor(255, 0, 0)
+        .rect(
+          x + Constants.Margin,
+          y - Constants.Margin,
+          w - 2 * Constants.Margin,
+          -h + 2 * Constants.Margin,
+          "S",
+        )
+        .setDrawColor(0, 0, 0)
+        .text(name, x + Constants.Margin, y - Constants.Margin);
+    }
+  }
+
+  drawBubbles(type) {
+    for (const [, blockData] of Object.entries(this.sheetProperties.inputs[type])) {
+      const {page, bubbles, questions} = blockData;
+
+      this.pdf
+        .setPage(page)
+        .setFillColor(type === "keys" ? "#00FF00" : "#0000FF");
+
+      for (let question = 0; question < questions; question++) {
+        for (let bubble = 0; bubble < bubbles; bubble++) {
+          this.pdf.__Mark(blockData, question, bubble);
+        }
+      }
+    }
+  }
+
+  export() {
+    const content = `
+      <iframe
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+        src="${this.pdf.output("datauristring")}"></iframe>
+    `;
+
+    window.open().document.write(content);
+  }
+}
+
 function generate() {
   const answerSheet = document.querySelector(".ans-sheet");
   const sheetProperties = AnswerSheets[answerSheet.value];
 
-  if (!answerSheet) {
+  if (!sheetProperties) {
     return;
   }
 
-  const {w, h} = sheetProperties.dimensions;
-  const pdf = new jspdf.jsPDF({unit: "in", format: [w, h]})
-    .setProperties({title: "TODO"})
-    .setLineWidth(0.01)
-    .addPage();
+  const testData = null; // TODO
 
-  addBackground_DEBUG(pdf, sheetProperties, w, h);
-  addMetadata(pdf, sheetProperties);
-
-  exportPDF(pdf);
-}
-
-function addBackground_DEBUG(pdf, sheetProperties, w, h) {
-  for (const [page, url] of Object.entries(sheetProperties.images)) {
-    pdf.setPage(page);
-    pdf.addImage(url, "JPEG", 0, 0, w, h);
-  }
-}
-
-function addMetadata(pdf, sheetProperties) {
-  for (const [, {page, x, y, w, h}] of Object.entries(sheetProperties.inputs.meta)) {
-    pdf.setPage(page);
-    pdf.rect(x, y, w, -h);
-    pdf.rect(
-      x + Constants.Margin,
-      y - Constants.Margin,
-      w - 2 * Constants.Margin,
-      -h + 2 * Constants.Margin,
-    );
-  }
-}
-
-function exportPDF(pdf) {
-  const content = `
-    <iframe
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;"
-      src="${pdf.output("datauristring")}"
-    ></iframe>
-  `;
-
-  window.open().document.write(content);
+  const generator = new Generator(sheetProperties);
+  generator.generate(testData);
+  generator.export();
 }
