@@ -1,3 +1,31 @@
+/**
+ * IMPORTANT
+ * =========
+ *
+ * One time setup to support printing (Windows):
+ *
+ * 1. Printers & Scanners
+ * 2. Select your printer
+ * 3. Printer properties
+ * 4. Advanced
+ * 5. Driver set to whatever supports custom forms
+ *   -> Probably proprietary driver for your printer
+ * 6. OK
+ * 7. Printers & Scanners
+ * 8. Print server properties
+ * 9. Create a new form
+ * 10. Form name
+ * 11. Paper size
+ * 12. Margin zero
+ * 13. Save form
+ * 14. OK
+ * 15. Print PDF button
+ * 16. More settings
+ * 17. Paper size set to name of form
+ * 18. Scale set to "Fit to paper"
+ * 19. Print
+ */
+
 document.addEventListener("DOMContentLoaded", main);
 
 var TestData = {
@@ -26,6 +54,9 @@ function configureButtonBindings() {
 
 function upload() {
   // TODO
+
+  // TestData.answers = [0, 1, 2, 3, 4, 0, 1, 2, 3, 4];
+
   TestData.answers = {
      0: 0,  1: 1,  2: 2,  3: 3,  4: 4,
     10: 0, 11: 1, 12: 2, 13: 3, 14: 4,
