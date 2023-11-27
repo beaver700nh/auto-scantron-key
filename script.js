@@ -93,7 +93,7 @@ class Generator {
   generate(testData) {
     this.pdf.setDocumentProperties({title: testData.meta.subject});
 
-    this.drawBackground();
+    // this.drawBackground();
 
     // this.drawMetadata();
     this.generateMetadata(testData.meta);
